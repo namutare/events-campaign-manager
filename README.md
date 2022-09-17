@@ -1,1 +1,1 @@
-# events-campaign-manager
+# Events Campaign Manager
