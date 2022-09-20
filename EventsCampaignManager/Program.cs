@@ -39,14 +39,30 @@ namespace EventsCampaignManager
              */
             Console.WriteLine("Question 1 solution:");
             var eventsWithinCustomerCity = GetEventsWithinCustomerCity(customer, events);
-            SendEvents(customer, eventsWithinCustomerCity);
+
+            if (eventsWithinCustomerCity.Count == 0)
+            {
+                Console.WriteLine("Error processing request, please check call stack for details.");
+            }
+            else
+            {
+                SendEvents(customer, eventsWithinCustomerCity);
+            }
 
             /*Question 2: Call #GetFiveClosestEvents that abstracts the business logic for getting top 5 events closest to the customer
              * To send the events to the customer, call #SendEvents that abstracts the event sending business logic
              */
-            Console.WriteLine("Question 2 solution:");
+            Console.WriteLine("Question 2 solutihon:");
             var fiveClosestEvents = GetFiveClosestEvents(customer, events);
-            SendEvents(customer, fiveClosestEvents);
+
+            if (fiveClosestEvents.Count == 0)
+            {
+                Console.WriteLine("Error processing request, please check call stack for details.");
+            }
+            else
+            {
+                SendEvents(customer, fiveClosestEvents);
+            }
 
             // Question 3: Check dictionary implementation in #GetFiveClosestEvents
 
@@ -56,14 +72,30 @@ namespace EventsCampaignManager
             */
             Console.WriteLine("Question 4 solution:");
             var mostPlausibleEvents = GetMostPlausibleEvents(customer, events);
-            SendEvents(customer, mostPlausibleEvents);
+
+            if (mostPlausibleEvents.Count == 0)
+            {
+                Console.WriteLine("Error processing request, please check call stack for details.");
+            }
+            else
+            {
+                SendEvents(customer, mostPlausibleEvents);
+            }
 
             /*Question 5: Call #GetFiveMostAffordableEvents that abstracts the business logic for getting top 5 most affordable events
              * To send the events to the customer, call #SendEvents that abstracts the event sending business logic
              */
             Console.WriteLine("Question 5 solution:");
             var fiveMostAffordableEvents = GetFiveMostAffordableEvents(customer, events);
-            SendEvents(customer, fiveMostAffordableEvents);
+
+            if (fiveMostAffordableEvents.Count == 0)
+            {
+                Console.WriteLine("Error processing request, please check call stack for details.");
+            }
+            else
+            {
+                SendEvents(customer, fiveMostAffordableEvents);
+            }
 
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
@@ -111,7 +143,7 @@ namespace EventsCampaignManager
             // Call #EventsByCity to find all events in the customer's location 
             string customerCity = ValidateCustomerCity(customer);
 
-            if (string.IsNullOrEmpty(customerCity))
+            if (customerCity == "Invalid")
             {
                 Console.WriteLine("Customer city invalid!");
                 return new List<Event>();
@@ -130,10 +162,10 @@ namespace EventsCampaignManager
             // The dictionary is part of the optimization that answers Question 3
             string customerCity = ValidateCustomerCity(customer);
 
-            if (string.IsNullOrEmpty(customerCity))
+            if (customerCity == "Invalid")
             {
                 Console.WriteLine("Customer city invalid!");
-                new List<Event>();
+                return new List<Event>();
             }
 
             Dictionary<int, string> eventDistances = new Dictionary<int, string>();
@@ -211,7 +243,7 @@ namespace EventsCampaignManager
             // 1. Loop through the events calling #GetPrice and then store the values in a dictionary against each event
             string customerCity = ValidateCustomerCity(customer);
 
-            if (string.IsNullOrEmpty(customerCity))
+            if (customerCity == "Invalid")
             {
                 Console.WriteLine("Customer city invalid!");
                 return new List<Event>();
