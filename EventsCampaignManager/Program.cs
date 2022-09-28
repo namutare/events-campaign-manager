@@ -21,202 +21,200 @@ namespace EventsCampaignManager
         static void Main(string[] args)
         {
             var events = new List<Event>{
-                    new Event{ Name = "Phantom of the Opera", City = "New York"},
-                    new Event{ Name = "Metallica", City = "Los Angeles"},
-                    new Event{ Name = "Metallica", City = "New York"},
-                    new Event{ Name = "Metallica", City = "Boston"},
-                    new Event{ Name = "LadyGaGa", City = "New York"},
-                    new Event{ Name = "LadyGaGa", City = "Boston"},
-                    new Event{ Name = "LadyGaGa", City = "Chicago"},
-                    new Event{ Name = "LadyGaGa", City = "San Francisco"},
-                    new Event{ Name = "LadyGaGa", City = "Washington"}
-                };
+                new Event{ Name = "Phantom of the Opera", City = "New York"},
+                new Event{ Name = "Metallica", City = "Los Angeles"},
+                new Event{ Name = "Metallica", City = "New York"},
+                new Event{ Name = "Metallica", City = "Boston"},
+                new Event{ Name = "LadyGaGa", City = "New York"},
+                new Event{ Name = "LadyGaGa", City = "Boston"},
+                new Event{ Name = "LadyGaGa", City = "Chicago"},
+                new Event{ Name = "LadyGaGa", City = "San Francisco"},
+                new Event{ Name = "LadyGaGa", City = "Washington"}
+            };
 
             var customer = new Customer { Name = "Mr. Fake", City = "New York" };
+            var nullCustomer = new Customer();
 
-            /*Question 1: Call #GetEventsWithinCustomerCity that abstracts the business logic for getting events within the customer's city
-             * To send the events to the customer, call #SendEvents that abstracts the event sending business logic
-             */
-            Console.WriteLine("Question 1 solution:");
-            var eventsWithinCustomerCity = GetEventsWithinCustomerCity(customer, events);
-
-            if (eventsWithinCustomerCity.Count == 0)
+            // Question 1: Call #GetEventsWithinCustomerCity to get the list of events to send out
+            Console.WriteLine("Events within customer city:");
+            try
             {
-                Console.WriteLine("Error processing request, please check call stack for details.");
+                var eventsWithinCustomerCity = GetEventsWithinCustomerCity(customer, events);
+
+                // Call #SendEmails that abstracts away the email sending logic
+                SendEmails(customer, eventsWithinCustomerCity);
             }
-            else
+            catch (Exception)
             {
-                SendEvents(customer, eventsWithinCustomerCity);
-            }
-
-            /*Question 2: Call #GetFiveClosestEvents that abstracts the business logic for getting top 5 events closest to the customer
-             * To send the events to the customer, call #SendEvents that abstracts the event sending business logic
-             */
-            Console.WriteLine("Question 2 solutihon:");
-            var fiveClosestEvents = GetFiveClosestEvents(customer, events);
-
-            if (fiveClosestEvents.Count == 0)
-            {
-                Console.WriteLine("Error processing request, please check call stack for details.");
-            }
-            else
-            {
-                SendEvents(customer, fiveClosestEvents);
+                Console.WriteLine($"Error processing request, please check call stack for exception details.");
             }
 
-            // Question 3: Check dictionary implementation in #GetFiveClosestEvents
-
-            /*Question 4: Call #GetMostPlausibleEvents that abstracts the business logic for getting the most plausible events closest to the customer
-             * This is in the event the #GetDistance function fails
-            * To send the events to the customer, call #SendEvents that abstracts the event sending business logic
-            */
-            Console.WriteLine("Question 4 solution:");
-            var mostPlausibleEvents = GetMostPlausibleEvents(customer, events);
-
-            if (mostPlausibleEvents.Count == 0)
+            // Question 2: Call #GetFiveClosentsEvents to get the list of five closest events
+            Console.WriteLine("Five closest events:");
+            try
             {
-                Console.WriteLine("Error processing request, please check call stack for details.");
+                var fiveClosestEvents = GetFiveClosestEvents(customer, events);
+
+                // Call #SendEmails that abstracts away the email sending logic
+                SendEmails(customer, fiveClosestEvents);
             }
-            else
+            catch (Exception)
             {
-                SendEvents(customer, mostPlausibleEvents);
+                Console.WriteLine($"Error processing request, please check call stack for exception details.");
             }
 
-            /*Question 5: Call #GetFiveMostAffordableEvents that abstracts the business logic for getting top 5 most affordable events
-             * To send the events to the customer, call #SendEvents that abstracts the event sending business logic
-             */
-            Console.WriteLine("Question 5 solution:");
-            var fiveMostAffordableEvents = GetFiveMostAffordableEvents(customer, events);
-
-            if (fiveMostAffordableEvents.Count == 0)
+            // Question 4: Call #GetMostPlausibleEvents to get the list of the most plausible events the customer can attend
+            Console.WriteLine("Most plausible events:");
+            try
             {
-                Console.WriteLine("Error processing request, please check call stack for details.");
+                var mostPlausibleEvents = GetMostPlausibleEvents(customer, events);
+
+                // Call #SendEmails that abstracts away the email sending logic
+                SendEmails(customer, mostPlausibleEvents);
             }
-            else
+            catch (Exception)
             {
-                SendEvents(customer, fiveMostAffordableEvents);
+                Console.WriteLine($"Error processing request, please check call stack for exception details.");
             }
 
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+            // Question 5: Call #GetFiveMostAffordableEvents to get the list of five closed
+            Console.WriteLine("Five most affordable events:");
+            try
+            {
+                var fiveMostAffordableEvents = GetFiveMostAffordableEvents(events);
+
+                // Call #SendEmails that abstracts away the email sending logic
+                SendEmails(customer, fiveMostAffordableEvents);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine($"Error processing request, please check call stack for exception details.");
+            }
         }
 
-        // This function validates the customer city
-        static string ValidateCustomerCity(Customer customer)
+        // This fuction loops through a list of events calling #AddToEmail for each
+        static void SendEmails(Customer customer, List<Event> events, int? price = null)
         {
-            // Check for nulls to prevent runtime exceptions
-            string customerCity = customer != null ? customer.City : string.Empty;
-
-            if (string.IsNullOrEmpty(customerCity))
+            for(int i = 0; i < events.Count; i++ )
             {
-                return "Invalid";
-            }
-            else
-            {
-                return customerCity;
+                AddToEmail(customer, events[i], price);
             }
         }
 
-        // This function returns events by city name using a linq query with lambda expression
+        // This function validates a customer object
+        static (string, string) ValidateCustomer(Customer customer)
+        {
+            if(string.IsNullOrEmpty(customer.Name))
+            {
+                throw new ArgumentException(message: $"{nameof(customer.Name)} is null!");
+            }
+            else if(string.IsNullOrEmpty(customer.City))
+            {
+                throw new ArgumentException(message: $"{nameof(customer.City)} is null!");
+            }
+
+            return (customer.Name, customer.City);
+        }
+
+        // This function validates an event object
+        static (string, string) ValidateEvent(Event coolEvent)
+        {
+            if(string.IsNullOrEmpty(coolEvent.Name))
+            {
+                throw new ArgumentException(message: $"{nameof(coolEvent.Name)} is null!");
+            }
+            else if(string.IsNullOrEmpty(coolEvent.City))
+            {
+                throw new ArgumentException(message: $"{nameof(coolEvent.City)} is null!");
+            }
+
+            return (coolEvent.Name, coolEvent.City);
+        }
+
+        // This function returns events by city using a linq query that uses a lambda expression
         static List<Event> EventsByCity(string city, List<Event> events)
         {
-            return events.Where(e => e.City == city).ToList();
+        return events.Where(e => e.City == city).ToList();
         }
 
-        // This function loops through events, calling #AddToEmail to send the notification to the customer
-        static void SendEvents(Customer customer, List<Event> events)
+        // This function returns events by name and city using a linq query that uses a lambda expression
+        static List<Event> EventsByNameAndCity(string[] nameAndCity, List<Event> events)
         {
-            // Loop through the list of events and for each item, call the #AddToEmail method
-
-            for (int i = 0; i < events.Count; i++)
-            {
-                AddToEmail(customer, events[i]);
-            }
+            string name = nameAndCity[0], city = nameAndCity[1];
+            return events.Where(e => e.Name == name && e.City == city).ToList();
         }
 
-        /* This function takes as input a customer and a list of events that it matches
-         * The criteria used here is that the events must be within the customer's city
-         * And returns all the matches found
-         */
+        // This function filters a list of events and returns all events occuring within the customer's city
         static List<Event> GetEventsWithinCustomerCity(Customer customer, List<Event> events)
         {
-            // Call #EventsByCity to find all events in the customer's location 
-            string customerCity = ValidateCustomerCity(customer);
-
-            if (customerCity == "Invalid")
+            try
             {
-                Console.WriteLine("Customer city invalid!");
-                return new List<Event>();
-            }
+                // There might be null values passed in, we need to validate
+                (string, string) validCustomer = ValidateCustomer(customer);
 
-            return EventsByCity(customerCity, events);
+                // Call events by city that abstracts the filtering
+                return EventsByCity(validCustomer.Item2, events);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occured during customer validation. Error message: {ex.Message}");
+                throw;
+            }
         }
 
-        /* This function takes as input a customer and a list of events that it matches
-         * It calls #GetDistance to get the distance between the customer and the city within which the event will occur
-         * It then filters and returns the 5 closest events
-         */
+        // This function returns five events happening around the customer, including in nearby cities
         static List<Event> GetFiveClosestEvents(Customer customer, List<Event> events)
         {
-            //1. From the customer's city, calculate the distance to the event and store the values in a dictionary, and the keys in an array
-            // The dictionary is part of the optimization that answers Question 3
-            string customerCity = ValidateCustomerCity(customer);
+            // Call #GetDistance storing the distances to the various cities in an ordered dictionary
+            SortedDictionary<int, string> eventDistances = new SortedDictionary<int, string>();
 
-            if (customerCity == "Invalid")
+            // Validate customer city
+            string fromCity = string.Empty;
+
+            try
             {
-                Console.WriteLine("Customer city invalid!");
-                return new List<Event>();
+                (string, string) customerCity = ValidateCustomer(customer);
+                fromCity = customerCity.Item2;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occured during customer validation. Error message: {ex.Message}");
+                throw;
             }
 
-            Dictionary<int, string> eventDistances = new Dictionary<int, string>();
-            int[] distances = new int[events.Count];
-
-            for (int i = 0; i < events.Count; i++)
+            foreach(Event coolEvent in events)
             {
-                int distance = GetDistance(customerCity, events[i].City);
-                distances[i] = distance;
-
-                if (!eventDistances.ContainsKey(distance))
+                try
                 {
-                    eventDistances.Add(distance, events[i].City);
-                }
-            }
+                    // Validate event city
+                    (string, string) eventCity = ValidateEvent(coolEvent);
+                    string toCity = eventCity.Item2;
+                    int distance = GetDistance(fromCity, toCity);
 
-            //2. Sort the distances in ascending order, then loop through them to pull top 5 events from the cities in the dictionary
-            Array.Sort(distances);
-
-            int eventCount = 0;
-            string lastCity = string.Empty;
-            List<Event> closestEvents = new List<Event>();
-            for (int i = 0; i < distances.Length; i++)
-            {
-                int sortedDistance = distances[i];
-                string city = eventDistances[sortedDistance];
-
-                if (lastCity != city)
-                {
-                    List<Event> thisCityEvents = EventsByCity(city, events);
-
-                    eventCount += thisCityEvents.Count;
-                    closestEvents.AddRange(thisCityEvents);
-
-                    if (eventCount >= 5)
+                    if(!eventDistances.ContainsKey(distance))
                     {
-                        break;
-                    }
+                        eventDistances.Add(distance, eventCity.Item2);
+                    }           
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while attempting to calculate city distances. Error message: {ex.Message}");
+                    throw;
+                }
+            } 
 
-                lastCity = city;
+            // Loop through the ordered dictionary retrieving event city names for events lookup
+            List<Event> orderedEvents = new List<Event>();
+
+            foreach(KeyValuePair<int, string> entry in eventDistances)
+            {
+                var orderedCityEvents = EventsByCity(entry.Value, events);
+                orderedEvents.AddRange(orderedCityEvents);
             }
-
-            //3. Return the top 5 events from the closest events list
-            return closestEvents.Take<Event>(5).ToList();
+      
+            return orderedEvents.Take(5).ToList();
         }
 
-        /* The #GetFiveClosestEvents implements #GetDistance, if for some reason the #GetDistance function fails
-         * This function wraps #GetFiveClosestEvents into a try catch block, and will default to events within the customer's city if #GetFiveClosestEvents fails
-         * Due to the upstream error in #GetDistance
-         */
         static List<Event> GetMostPlausibleEvents(Customer customer, List<Event> events)
         {
             // The priority is to get the top 5 closest events
@@ -226,7 +224,7 @@ namespace EventsCampaignManager
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error while retrieving events by proximity by distance. Error message: {ex.Message}");
+                Console.WriteLine($"Error while retrieving events by proximity. Error message: {ex.Message}");
                 throw;
             }
             finally
@@ -236,61 +234,47 @@ namespace EventsCampaignManager
             }
         }
 
-        /* This function sorts the events by price and returns the top 5 most affordable events to the customer
-         */
-        static List<Event> GetFiveMostAffordableEvents(Customer customer, List<Event> events)
+        // This functions returns five most affordable events irrespective of the distance from the customer
+        static List<Event> GetFiveMostAffordableEvents(List<Event> events)
         {
-            // 1. Loop through the events calling #GetPrice and then store the values in a dictionary against each event
-            string customerCity = ValidateCustomerCity(customer);
+            // For each event, populate their prices in a sorted list, then use it to lookup the most affordable events
+            // We are using a sorted list because several events may have the same prices
+            SortedList<int, string> sortedEventPrices = new SortedList<int, string>();
 
-            if (customerCity == "Invalid")
+            // Loop through the list of events populating the dictionary
+            foreach(var coolEvent in events)
             {
-                Console.WriteLine("Customer city invalid!");
-                return new List<Event>();
-            }
-
-            Dictionary<int, string> eventPrices = new Dictionary<int, string>();
-            int[] prices = new int[events.Count];
-
-            for (int i = 0; i < events.Count; i++)
-            {
-                int price = GetPrice(events[i]);
-                prices[i] = price;
-
-                if (!eventPrices.ContainsKey(price))
+                try
                 {
-                    eventPrices.Add(price, events[i].Name);
+                    // Validate event
+                    (string, string) eventName = ValidateEvent(coolEvent);
+                    string thisEventName = eventName.Item1, thisEventCity = eventName.Item2;
+                    int eventPrice = GetPrice(coolEvent);
+
+                    sortedEventPrices.Add(eventPrice, $"{thisEventName}|{thisEventCity}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while attempting to calculate event price. Error message: {ex.Message}");
+                    throw;
                 }
             }
 
-            //2. Sort the prices in ascending order, then loop through them to pull top 5 events from the event names in the dictionary
-            Array.Sort(prices);
+            // Loop through the sorted list retrieving event city names for events lookup
+            List<Event> orderedPrices = new List<Event>();
 
-            int eventCount = 0;
-            List<Event> mostAffordableEvents = new List<Event>();
-            for (int i = 0; i < prices.Length; i++)
+            foreach(KeyValuePair<int, string> entry in sortedEventPrices)
             {
-                int sortedPrice = prices[i];
-                string eventName = eventPrices[sortedPrice];
-                List<Event> thisNameEvents = events.Where(e => e.Name == eventName).ToList();
+                string eventName = entry.Value.Split('|')[0], eventCity = entry.Value.Split('|')[1];
+                var orderedPriceEvents = EventsByNameAndCity(new string[] { eventName, eventCity }, events);
 
-                eventCount += thisNameEvents.Count;
-                mostAffordableEvents.AddRange(thisNameEvents);
-
-                if (eventCount >= 5)
-                {
-                    break;
-                }
+                orderedPrices.AddRange(orderedPriceEvents);
             }
-
-            //3. Return the top 5 events from the most affordable events list
-            return mostAffordableEvents.Take<Event>(5).ToList();
+      
+            return orderedPrices.Take(5).ToList();
         }
 
-        /* =================================================================================================================================
-         * You do not need to know how these methods work
-         * =================================================================================================================================
-         */
+        // You do not need to know how these methods work      
         static void AddToEmail(Customer c, Event e, int? price = null)
         {
             var distance = GetDistance(c.City, e.City);
@@ -303,7 +287,6 @@ namespace EventsCampaignManager
         static int GetDistance(string fromCity, string toCity)
         {
             return AlphebiticalDistance(fromCity, toCity);
-            //return 0 / 3;
         }
         private static int AlphebiticalDistance(string s, string t)
         {
