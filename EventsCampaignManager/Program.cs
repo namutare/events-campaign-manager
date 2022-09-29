@@ -265,8 +265,8 @@ namespace EventsCampaignManager
 
             foreach(KeyValuePair<int, string> entry in sortedEventPrices)
             {
-                string eventName = entry.Value.Split('|')[0], eventCity = entry.Value.Split('|')[1];
-                var orderedPriceEvents = EventsByNameAndCity(new string[] { eventName, eventCity }, events);
+                string[] eventDetails = entry.Value.Split('|');
+                var orderedPriceEvents = EventsByNameAndCity(eventDetails, events);
 
                 orderedPrices.AddRange(orderedPriceEvents);
             }
