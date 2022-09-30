@@ -165,6 +165,8 @@ namespace EventsCampaignManager
                 {
                     Console.WriteLine($"An error occured while querying events by city. Error message: {ex.Message}");
                 }
+                
+                throw;
             }
         }
 
