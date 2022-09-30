@@ -157,8 +157,14 @@ namespace EventsCampaignManager
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occured during customer validation. Error message: {ex.Message}");
-                throw;
+                if(ex.Message.EndsWith("is null!"))
+                {
+                    Console.WriteLine($"An error occured during customer validation. Error message: {ex.Message}");
+                }
+                else
+                {
+                    Console.WriteLine($"An error occured while querying events by city. Error message: {ex.Message}");
+                }
             }
         }
 
